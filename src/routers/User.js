@@ -5,9 +5,11 @@ const { User } = require('../models/_User');
 router.post('/users', async (req, res) => {
   try {
     const user = new User(req.body);
+    const token = await user.generateAuthToken();
+    user.refreshTokens = user.refreshTokens.concat({ token });
     await user.save();
     //
-    res.send(user);
+    res.send({ user, token });
   } catch(error) {
     res.status(400).send({ message: error.message });
   }
@@ -69,7 +71,12 @@ router.post('/users/login', async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await User.findByCredentials(email, password);
-    res.send(user);
+    //
+    const token = await user.generateAuthToken();
+    user.refreshTokens = user.refreshTokens.concat({ token });
+    await user.save();
+    //
+    res.send({ user, token });
   } catch (error) {
     res.status(400).send({ message: error.message });
   }
