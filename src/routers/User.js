@@ -9,7 +9,7 @@ router.post('/users', async (req, res) => {
     //
     res.send(user);
   } catch(error) {
-    res.status(400).send(error);
+    res.status(400).send({ message: error.message });
   }
 });
 
@@ -19,7 +19,7 @@ router.get('/users', async (req, res) => {
     //
     res.send(users);
   } catch(error) {
-    res.status(400).send(error);
+    res.status(400).send({ message: error.message });
   }
 });
 
@@ -27,13 +27,13 @@ router.get('/users/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const user = await User.findById(id);
-    if (lodash.isNil(user)) {
+    if (!user) {
       throw new Error("Not found!");
     }
     //
     res.send(user);
   } catch(error) {
-    res.status(400).send(error.message);
+    res.status(400).send({ message: error.message });
   }
 });
 
@@ -41,13 +41,13 @@ router.put('/users/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const user = await User.findByIdAndUpdate(id, req.body, { new: true, runValidators: true })
-    if (lodash.isNil(user)) {
+    if (!user) {
       throw new Error("Not found!");
     }
     //
     res.send(user);
   } catch(error) {
-    res.status(400).send(error.message);
+    res.status(400).send({ message: error.message });
   }
 });
 
@@ -55,13 +55,23 @@ router.delete('/users/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const user = await User.findByIdAndDelete(id);
-    if (lodash.isNil(user)) {
+    if (!user) {
       throw new Error("Not found!");
     }
     //
     res.send(user);
   } catch(error) {
-    res.status(400).send(error.message);
+    res.status(400).send({ message: error.message });
+  }
+});
+
+router.post('/users/login', async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const user = await User.findByCredentials(email, password);
+    res.send(user);
+  } catch (error) {
+    res.status(400).send({ message: error.message });
   }
 });
 

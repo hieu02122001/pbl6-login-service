@@ -27,13 +27,13 @@ router.get('/tasks/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const task = await Task.findById(id);
-    if (lodash.isNil(task)) {
+    if (!task) {
       throw new Error("Not found!");
     }
     //
     res.send(task);
   } catch(error) {
-    res.status(400).send(error.message);
+    res.status(400).send({ message: error.message });
   }
 });
 
@@ -41,13 +41,13 @@ router.put('/tasks/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const task = await Task.findByIdAndUpdate(id, req.body, { new: true, runValidators: true })
-    if (lodash.isNil(task)) {
+    if (!task) {
       throw new Error("Not found!");
     }
     //
     res.send(task);
   } catch(error) {
-    res.status(400).send(error.message);
+    res.status(400).send({ message: error.message });
   }
 });
 
@@ -55,13 +55,13 @@ router.delete('/tasks/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const task = await Task.findByIdAndDelete(id);
-    if (lodash.isNil(task)) {
+    if (!task) {
       throw new Error("Not found!");
     }
     //
     res.send(task);
   } catch(error) {
-    res.status(400).send(error.message);
+    res.status(400).send({ message: error.message });
   }
 });
 
