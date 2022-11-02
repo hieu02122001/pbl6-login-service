@@ -3,7 +3,7 @@ const { User } = require('../models/_User');
 
 const auth = async (req, res, next) => {
   try {
-    const token = req.header('token');
+    const token = req.header('token').replace('Bearer ', '');
     const tokenDecoded = decodeToken(token);
     const user = await User.findOne({
       _id: tokenDecoded._id,
@@ -14,6 +14,7 @@ const auth = async (req, res, next) => {
       throw new Error();
     }
     //
+    req.token = token;
     req.user = user;
     //
     next();
@@ -23,7 +24,6 @@ const auth = async (req, res, next) => {
 }
 
 const decodeToken = (token) => {
-  token = token.replace('Bearer ', '');
   const decoded = jwt.verify(token, 'shibabooking');
   return {
     token,

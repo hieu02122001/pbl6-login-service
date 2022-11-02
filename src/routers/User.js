@@ -1,4 +1,5 @@
 const express = require('express');
+const lodash = require('lodash');
 const router = new express.Router();
 const { User } = require('../models/_User');
 const { auth } = require('../middleware/auth');
@@ -92,5 +93,20 @@ router.get('/me', auth, async (req, res) => {
     res.status(400).send({ message: error.message });
   }
 });
+
+router.post('/me/logout', auth, async (req, res) => {
+  try {
+    req.user.refreshTokens = lodash.filter(req.user.refreshTokens, (item) => {
+      return item.token !== req.token;
+    });
+    //
+    await req.user.save();
+    //
+    res.send("Logout successfully");
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+});
+
 
 module.exports = router;
