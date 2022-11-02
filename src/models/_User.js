@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const lodash = require('lodash');
 //
 const HASH_TIMES = 8;
 const AUTH_KEY = 'shibabooking';
@@ -67,6 +68,13 @@ userSchema.methods.generateAuthToken = async function () {
   }, AUTH_KEY);
   //
   return token;
+}
+//
+userSchema.methods.toJSON = function () {
+  const user = this;
+  const userObject = lodash.omit(user.toObject(), ["password", "refreshTokens"]);
+
+  return userObject;
 }
 // # Middle-wares
 // Hash password
