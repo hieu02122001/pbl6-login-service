@@ -1,6 +1,7 @@
 const express = require('express');
 const router = new express.Router();
 const { User } = require('../models/_User');
+const { auth } = require('../middleware/auth');
 
 router.post('/users', async (req, res) => {
   try {
@@ -15,7 +16,7 @@ router.post('/users', async (req, res) => {
   }
 });
 
-router.get('/users', async (req, res) => {
+router.get('/users', auth, async (req, res) => {
   try {
     const users = await User.find({});
     //
@@ -78,6 +79,16 @@ router.post('/users/login', async (req, res) => {
     //
     res.send({ user, token });
   } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+});
+
+// ------------------------------------------------------------------------------------
+
+router.get('/me', auth, async (req, res) => {
+  try {
+    res.send(req.user);
+  } catch(error) {
     res.status(400).send({ message: error.message });
   }
 });
