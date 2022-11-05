@@ -1,6 +1,6 @@
 const express = require('express');
 const lodash = require('lodash');
-require('./database/mongoose');
+require('./models/database/mongoose');
 const userRouter = require('./routers/User');
 const taskRouter = require('./routers/Task');
 const cors = require('cors');

@@ -4,7 +4,9 @@ const router = new express.Router();
 const { User } = require('../models/_User');
 const { auth } = require('../middleware/auth');
 
-router.post('/users', async (req, res) => {
+const PATH = '/api/v1';
+
+router.post(PATH + '/users', async (req, res) => {
   try {
     const user = new User(req.body);
     const token = await user.generateAuthToken();
@@ -17,7 +19,7 @@ router.post('/users', async (req, res) => {
   }
 });
 
-router.get('/users', auth, async (req, res) => {
+router.get(PATH + '/users', auth, async (req, res) => {
   try {
     const users = await User.find({});
     //
@@ -27,7 +29,7 @@ router.get('/users', auth, async (req, res) => {
   }
 });
 
-router.get('/users/:id', async (req, res) => {
+router.get(PATH + '/users/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const user = await User.findById(id);
@@ -41,7 +43,7 @@ router.get('/users/:id', async (req, res) => {
   }
 });
 
-router.put('/users/:id', async (req, res) => {
+router.put(PATH + '/users/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const user = await User.findByIdAndUpdate(id, req.body, { new: true, runValidators: true })
@@ -55,7 +57,7 @@ router.put('/users/:id', async (req, res) => {
   }
 });
 
-router.delete('/users/:id', async (req, res) => {
+router.delete(PATH + '/users/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const user = await User.findByIdAndDelete(id);
@@ -69,7 +71,7 @@ router.delete('/users/:id', async (req, res) => {
   }
 });
 
-router.post('/users/login', async (req, res) => {
+router.post(PATH + '/users/login', async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await User.findByCredentials(email, password);
@@ -86,7 +88,7 @@ router.post('/users/login', async (req, res) => {
 
 // ------------------------------------------------------------------------------------
 
-router.get('/me', auth, async (req, res) => {
+router.get(PATH + '/me', auth, async (req, res) => {
   try {
     res.send(req.user);
   } catch(error) {
@@ -94,7 +96,7 @@ router.get('/me', auth, async (req, res) => {
   }
 });
 
-router.post('/me/logout', auth, async (req, res) => {
+router.post(PATH + '/me/logout', auth, async (req, res) => {
   try {
     req.user.refreshTokens = lodash.filter(req.user.refreshTokens, (item) => {
       return item.token !== req.token;
