@@ -3,8 +3,10 @@ const lodash = require('lodash');
 require('./database/mongoose');
 const userRouter = require('./routers/User');
 const taskRouter = require('./routers/Task');
+const cors = require('cors');
 
 const app = express();
+app.use(cors());
 const PORT = process.env.PORT || 3000;
 //
 app.use(express.json());
