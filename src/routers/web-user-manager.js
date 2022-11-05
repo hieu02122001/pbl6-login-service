@@ -11,12 +11,12 @@ const userManager = new UserManager();
 
 router.post(PATH + '/users', async (req, res) => {
   try {
-    const user = new User(req.body);
-    const token = await user.generateAuthToken();
-    user.refreshTokens = user.refreshTokens.concat({ token });
-    await user.save();
+    const PICK_FIELDS = ["firstName", "lastName", "email", "password", "phone", "avatar", "gender"];
+    const userObj = lodash.pick(req.body, PICK_FIELDS);
     //
-    res.send({ user, token });
+    const { user } = await userManager.createUser(userObj);
+    //
+    res.send(user);
   } catch(error) {
     res.status(400).send({ message: error.message });
   }
@@ -85,6 +85,19 @@ router.post(PATH + '/users/login', async (req, res) => {
     //
     res.send({ user, token });
   } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+});
+
+router.post(PATH + '/sign-up', async (req, res) => {
+  try {
+    const PICK_FIELDS = ["firstName", "lastName", "email", "password", "phone", "avatar", "gender"];
+    const userObj = lodash.pick(req.body, PICK_FIELDS);
+    //
+    const { user, token } = await userManager.createUser(userObj, { generateAuthToken: true });
+    //
+    res.send({ user, token });
+  } catch(error) {
     res.status(400).send({ message: error.message });
   }
 });
