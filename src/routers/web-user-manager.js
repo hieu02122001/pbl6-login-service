@@ -2,9 +2,12 @@ const express = require('express');
 const lodash = require('lodash');
 const router = new express.Router();
 const { User } = require('../models/_User');
+const { UserManager } = require('../services/UserManager');
 const { auth } = require('../middleware/auth');
 
 const PATH = '/api/v1';
+
+const userManager = new UserManager();
 
 router.post(PATH + '/users', async (req, res) => {
   try {
@@ -21,7 +24,7 @@ router.post(PATH + '/users', async (req, res) => {
 
 router.get(PATH + '/users', auth, async (req, res) => {
   try {
-    const users = await User.find({});
+    const users = await userManager.findUsers();
     //
     res.send(users);
   } catch(error) {
