@@ -16,6 +16,16 @@ UserManager.prototype.findUsers = async function(criteria, more) {
   return output;
 };
 
+UserManager.prototype.getUser = async function(userId, more) {
+  const user = await User.findById(userId);
+  //
+  if (!user) {
+    throw new Error(`Not found user with id ${userId}!`);
+  }
+  //
+  return user;
+};
+
 UserManager.prototype.createUser = async function(userObj, more) {
   const user = new User(userObj);
   const output = {};

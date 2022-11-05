@@ -32,13 +32,10 @@ router.get(PATH + '/users', auth, async (req, res) => {
   }
 });
 
-router.get(PATH + '/users/:id', async (req, res) => {
+router.get(PATH + '/users/:id', auth, async (req, res) => {
   const { id } = req.params;
   try {
-    const user = await User.findById(id);
-    if (!user) {
-      throw new Error("Not found!");
-    }
+    const user = await userManager.getUser(id);
     //
     res.send(user);
   } catch(error) {
@@ -46,7 +43,7 @@ router.get(PATH + '/users/:id', async (req, res) => {
   }
 });
 
-router.put(PATH + '/users/:id', async (req, res) => {
+router.put(PATH + '/users/:id', auth, async (req, res) => {
   const { id } = req.params;
   try {
     const user = await User.findByIdAndUpdate(id, req.body, { new: true, runValidators: true })
