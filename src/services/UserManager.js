@@ -20,7 +20,7 @@ UserManager.prototype.getUser = async function(userId, more) {
   const user = await User.findById(userId);
   //
   if (!user) {
-    throw new Error(`Not found user with id ${userId}!`);
+    throw new Error(`Not found user with id [${userId}]!`);
   }
   //
   return user;
@@ -41,6 +41,16 @@ UserManager.prototype.createUser = async function(userObj, more) {
   output.user = user;
   //
   return output;
+};
+
+UserManager.prototype.updateUser = async function(userId, userObj, more) {
+  const user = await User.findByIdAndUpdate(userId, userObj, { new: true, runValidators: true });
+  //
+  if (!user) {
+    throw new Error(`Not found user with id [${userId}]!`);
+  }
+  //
+  return user;
 };
 
 module.exports = { UserManager };

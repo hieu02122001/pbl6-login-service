@@ -10,10 +10,10 @@ const PATH = '/api/v1';
 const userManager = new UserManager();
 
 router.post(PATH + '/users', async (req, res) => {
+  const PICK_FIELDS = ["firstName", "lastName", "email", "password", "phone", "avatar", "gender"];
+  const userObj = lodash.pick(req.body, PICK_FIELDS);
+  //
   try {
-    const PICK_FIELDS = ["firstName", "lastName", "email", "password", "phone", "avatar", "gender"];
-    const userObj = lodash.pick(req.body, PICK_FIELDS);
-    //
     const { user } = await userManager.createUser(userObj);
     //
     res.send(user);
@@ -44,12 +44,12 @@ router.get(PATH + '/users/:id', auth, async (req, res) => {
 });
 
 router.put(PATH + '/users/:id', auth, async (req, res) => {
+  const PICK_FIELDS = ["firstName", "lastName", "email", "password", "phone", "avatar", "gender"];
+  const userObj = lodash.pick(req.body, PICK_FIELDS);
   const { id } = req.params;
+  //
   try {
-    const user = await User.findByIdAndUpdate(id, req.body, { new: true, runValidators: true })
-    if (!user) {
-      throw new Error("Not found!");
-    }
+    const user = await userManager.updateUser(id, userObj);
     //
     res.send(user);
   } catch(error) {
@@ -57,7 +57,7 @@ router.put(PATH + '/users/:id', auth, async (req, res) => {
   }
 });
 
-router.delete(PATH + '/users/:id', async (req, res) => {
+router.delete(PATH + '/users/:id', auth, async (req, res) => {
   const { id } = req.params;
   try {
     const user = await User.findByIdAndDelete(id);
