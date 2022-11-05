@@ -8,18 +8,15 @@ const HASH_TIMES = 8;
 const AUTH_KEY = 'shibabooking';
 //
 const userSchema = new mongoose.Schema({
-  name: {
+  firstName: {
     type: String,
     required: true,
     trim: true,
   },
-  age: {
-    type: Number,
-    validate(value) {
-      if (value < 0) {
-        throw new Error('Age must be a positive number!')
-      }
-    }
+  lastName: {
+    type: String,
+    required: true,
+    trim: true,
   },
   email: {
     type: String,
@@ -36,7 +33,31 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
-    minlength: 7
+    minlength: 8
+  },
+  phone: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  avatar: {
+    type: String,
+    required: false,
+    trim: true,
+  },
+  gender: {
+    type: Boolean,
+    required: true,
+  },
+  isActive: {
+    type: Boolean,
+    required: true,
+    default: true,
+  },
+  isDeleted: {
+    type: Boolean,
+    required: true,
+    default: false,
   },
   refreshTokens: [{
     token: {
@@ -44,6 +65,10 @@ const userSchema = new mongoose.Schema({
       required: true
     }
   }],
+});
+// # virtual field
+userSchema.virtual('fullName').get(function() {
+  return `${this.firstName} ${this.lastName}`;
 });
 // # Methods
 userSchema.statics.findByCredentials = async (email, password) => {
@@ -71,9 +96,14 @@ userSchema.methods.generateAuthToken = async function () {
 }
 //
 userSchema.methods.toJSON = function () {
+  const PICK_FIELDS = ["fullName", "email", "phone", "avatar", "gender", "isActive", "isDeleted"];
+  //
   const user = this;
-  const userObject = lodash.omit(user.toObject(), ["password", "refreshTokens"]);
-
+  const userObject = lodash.pick(user, PICK_FIELDS);
+  //
+  userObject.id = lodash.get(user, "_id");
+  userObject.gender = userObject.gender ? "Male" : "Female";
+  //
   return userObject;
 }
 // # Middle-wares
