@@ -59,11 +59,9 @@ router.put(PATH + '/users/:id', auth, async (req, res) => {
 
 router.delete(PATH + '/users/:id', auth, async (req, res) => {
   const { id } = req.params;
+  //
   try {
-    const user = await User.findByIdAndDelete(id);
-    if (!user) {
-      throw new Error("Not found!");
-    }
+    const user = await userManager.deleteUser(id);
     //
     res.send(user);
   } catch(error) {

@@ -8,7 +8,11 @@ function UserManager(params) {
 //
 
 UserManager.prototype.findUsers = async function(criteria, more) {
-  const users = await User.find({});
+  const queryObj = {
+    isDeleted: false
+  };
+  //
+  const users = await User.find(queryObj);
   const output = {
     rows: users,
     count: users.length
@@ -45,6 +49,18 @@ UserManager.prototype.createUser = async function(userObj, more) {
 
 UserManager.prototype.updateUser = async function(userId, userObj, more) {
   const user = await User.findByIdAndUpdate(userId, userObj, { new: true, runValidators: true });
+  //
+  if (!user) {
+    throw new Error(`Not found user with id [${userId}]!`);
+  }
+  //
+  return user;
+};
+
+UserManager.prototype.deleteUser = async function(userId, more) {
+  const user = await User.findByIdAndUpdate(userId, {
+    isDeleted: true
+  }, { new: true });
   //
   if (!user) {
     throw new Error(`Not found user with id [${userId}]!`);
