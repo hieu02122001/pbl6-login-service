@@ -1,8 +1,10 @@
 const lodash = require('lodash');
 const { User } = require('../models/_User');
+const { RoleManager } = require('./RoleManager');
 
 function UserManager(params) {};
 
+const roleManager = new RoleManager();
 //
 
 UserManager.prototype.findUsers = async function(criteria, more) {
@@ -11,6 +13,10 @@ UserManager.prototype.findUsers = async function(criteria, more) {
   };
   //
   const users = await User.find(queryObj);
+  for (let i = 0; i < users.length; i++) {
+    users[i] = await this.wrapExtraToUser(users[i].toJSON());
+  }
+  //
   const output = {
     rows: users,
     count: users.length
@@ -28,7 +34,26 @@ UserManager.prototype.getUser = async function(userId, more) {
   return user;
 };
 
+UserManager.prototype.wrapExtraToUser = async function(userObj, more) {
+  // id
+  userObj.id = lodash.get(userObj, "_id").toString();
+  // gender
+  userObj.gender = userObj.gender ? "Male" : "Female";
+  // role
+  const roleId = lodash.get(userObj, "roleId");
+  if (roleId) {
+    const role = await roleManager.getRole(roleId);
+    userObj.role = {
+      id: role._id,
+      name: role.name
+    }
+  }
+  return lodash.omit(userObj, ["_id", "roleId"]);
+};
+
 UserManager.prototype.createUser = async function(userObj, more) {
+  const role = await roleManager.getRole(userObj.roleId);
+  //
   const user = new User(userObj);
   const output = {};
   //

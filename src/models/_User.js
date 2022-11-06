@@ -49,6 +49,10 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     required: true,
   },
+  roleId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Role'
+  },
   isActive: {
     type: Boolean,
     required: true,
@@ -96,13 +100,10 @@ userSchema.methods.generateAuthToken = async function () {
 }
 //
 userSchema.methods.toJSON = function () {
-  const PICK_FIELDS = ["firstName", "lastName", "fullName", "email", "phone", "avatar", "gender", "isActive", "isDeleted"];
+  const PICK_FIELDS = ["_id", "firstName", "lastName", "fullName", "email", "phone", "avatar", "gender", "roleId", "isActive", "isDeleted"];
   //
   const user = this;
   const userObject = lodash.pick(user, PICK_FIELDS);
-  //
-  userObject.id = lodash.get(user, "_id");
-  userObject.gender = userObject.gender ? "Male" : "Female";
   //
   return userObject;
 }

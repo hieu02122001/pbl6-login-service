@@ -10,7 +10,7 @@ const PATH = '/api/v1';
 const userManager = new UserManager();
 
 router.post(PATH + '/users', async (req, res) => {
-  const PICK_FIELDS = ["firstName", "lastName", "email", "password", "phone", "avatar", "gender"];
+  const PICK_FIELDS = ["firstName", "lastName", "email", "password", "phone", "avatar", "gender", "roleId"];
   const userObj = lodash.pick(req.body, PICK_FIELDS);
   //
   try {
@@ -86,7 +86,7 @@ router.post(PATH + '/users/login', async (req, res) => {
 
 router.post(PATH + '/sign-up', async (req, res) => {
   try {
-    const PICK_FIELDS = ["firstName", "lastName", "email", "password", "phone", "avatar", "gender"];
+    const PICK_FIELDS = ["firstName", "lastName", "email", "password", "phone", "avatar", "gender", "roleId"];
     const userObj = lodash.pick(req.body, PICK_FIELDS);
     //
     const { user, token } = await userManager.createUser(userObj, { generateAuthToken: true });
