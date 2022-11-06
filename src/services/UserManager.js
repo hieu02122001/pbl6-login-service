@@ -1,9 +1,7 @@
 const lodash = require('lodash');
 const { User } = require('../models/_User');
 
-function UserManager(params) {
-
-};
+function UserManager(params) {};
 
 //
 
@@ -68,5 +66,7 @@ UserManager.prototype.deleteUser = async function(userId, more) {
   //
   return user;
 };
+
+//
 
 module.exports = { UserManager };

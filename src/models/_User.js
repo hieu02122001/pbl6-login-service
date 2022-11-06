@@ -96,7 +96,7 @@ userSchema.methods.generateAuthToken = async function () {
 }
 //
 userSchema.methods.toJSON = function () {
-  const PICK_FIELDS = ["fullName", "email", "phone", "avatar", "gender", "isActive", "isDeleted"];
+  const PICK_FIELDS = ["firstName", "lastName", "fullName", "email", "phone", "avatar", "gender", "isActive", "isDeleted"];
   //
   const user = this;
   const userObject = lodash.pick(user, PICK_FIELDS);
