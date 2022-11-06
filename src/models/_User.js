@@ -1,11 +1,9 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const lodash = require('lodash');
 //
 const HASH_TIMES = 8;
-const AUTH_KEY = 'shibabooking';
 //
 const userSchema = new mongoose.Schema({
   firstName: {
@@ -87,16 +85,6 @@ userSchema.statics.findByCredentials = async (email, password) => {
   }
   //
   return user;
-}
-//
-userSchema.methods.generateAuthToken = async function () {
-  const user = this;
-  //
-  const token = jwt.sign({
-    _id: user._id.toString(),
-  }, AUTH_KEY);
-  //
-  return token;
 }
 //
 userSchema.methods.toJSON = function () {

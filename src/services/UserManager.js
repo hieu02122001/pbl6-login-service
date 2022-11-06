@@ -1,6 +1,7 @@
 const lodash = require('lodash');
 const { User } = require('../models/_User');
 const { RoleManager } = require('./RoleManager');
+const jwt = require('jsonwebtoken');
 
 function UserManager(params) {};
 
@@ -31,7 +32,7 @@ UserManager.prototype.getUser = async function(userId, more) {
     throw new Error(`Not found user with id [${userId}]!`);
   }
   //
-  return user;
+  return await this.wrapExtraToUser(user.toJSON());
 };
 
 UserManager.prototype.wrapExtraToUser = async function(userObj, more) {
@@ -52,13 +53,14 @@ UserManager.prototype.wrapExtraToUser = async function(userObj, more) {
 };
 
 UserManager.prototype.createUser = async function(userObj, more) {
-  const role = await roleManager.getRole(userObj.roleId);
+  // check if roleId is valid
+  await roleManager.getRole(userObj.roleId);
   //
   const user = new User(userObj);
   const output = {};
   //
   if (more && more.generateAuthToken === true) {
-    const token = await user.generateAuthToken();
+    const token = await this.generateAuthToken(user._id);
     user.refreshTokens = user.refreshTokens.concat({ token });
     //
     output.token = token;
@@ -68,6 +70,17 @@ UserManager.prototype.createUser = async function(userObj, more) {
   output.user = user;
   //
   return output;
+};
+
+UserManager.prototype.generateAuthToken = async function(userId, more) {
+  const user = await this.getUser(userId);
+  const AUTH_KEY = 'shibabooking';
+  //
+  const token = jwt.sign({
+  ...user
+  }, AUTH_KEY);
+  //
+  return token;
 };
 
 UserManager.prototype.updateUser = async function(userId, userObj, more) {

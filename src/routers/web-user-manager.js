@@ -74,7 +74,8 @@ router.post(PATH + '/users/login', async (req, res) => {
   try {
     const user = await User.findByCredentials(email, password);
     //
-    const token = await user.generateAuthToken();
+    const userId = lodash.get(user, "_id");
+    const token = await userManager.generateAuthToken(userId);
     user.refreshTokens = user.refreshTokens.concat({ token });
     await user.save();
     //

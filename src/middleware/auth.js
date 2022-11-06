@@ -6,7 +6,7 @@ const auth = async (req, res, next) => {
     const token = req.header('token').replace('Bearer ', '');
     const tokenDecoded = decodeToken(token);
     const user = await User.findOne({
-      _id: tokenDecoded._id,
+      _id: tokenDecoded.id,
       'refreshTokens.token': tokenDecoded.token
     })
     //
