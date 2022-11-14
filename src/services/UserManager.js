@@ -74,11 +74,11 @@ UserManager.prototype.createUser = async function(userObj, more) {
 
 UserManager.prototype.generateAuthToken = async function(userId, more) {
   const user = await this.getUser(userId);
-  const AUTH_KEY = 'shibabooking';
+  const AUTH_KEY = 'this is a super pro vip powerful secret key';
   //
   const token = jwt.sign({
   ...user
-  }, AUTH_KEY);
+  }, AUTH_KEY, {expiresIn: 864000});
   //
   return token;
 };

@@ -24,7 +24,7 @@ const auth = async (req, res, next) => {
 }
 
 const decodeToken = (token) => {
-  const decoded = jwt.verify(token, 'shibabooking');
+  const decoded = jwt.verify(token, 'this is a super pro vip powerful secret key');
   return {
     token,
     ...decoded
