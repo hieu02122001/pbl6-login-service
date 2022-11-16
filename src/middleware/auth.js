@@ -3,7 +3,7 @@ const { User } = require('../models/_User');
 
 const auth = async (req, res, next) => {
   try {
-    const token = req.header('token').replace('Bearer ', '');
+    const token = req.header('authorization').replace('Bearer ', '');
     const tokenDecoded = decodeToken(token);
     const user = await User.findOne({
       _id: tokenDecoded.id,
