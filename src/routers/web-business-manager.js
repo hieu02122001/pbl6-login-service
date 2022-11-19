@@ -1,0 +1,75 @@
+const express = require('express');
+const lodash = require('lodash');
+const router = new express.Router();
+const { User } = require('../models/_User');
+const { Business } = require('../models/_Business');
+const { UserManager } = require('../services/UserManager');
+const { BusinessManager } = require('../services/BusinessManager');
+const { auth } = require('../middleware/auth');
+
+const PATH = '/api/v1';
+
+const userManager = new UserManager();
+const businessManager = new BusinessManager();
+
+router.post(PATH + '/businesses', async (req, res) => {
+  const PICK_FIELDS = ["name", "email", "phone", "isActive"];
+  const businessObj = lodash.pick(req.body, PICK_FIELDS);
+  //
+  try {
+    const { business } = await businessManager.createBusiness(businessObj);
+    //
+    res.send(business);
+  } catch(error) {
+    res.status(400).send({ message: error.message });
+  }
+});
+
+router.get(PATH + '/businesses', auth, async (req, res) => {
+  try {
+    const businesses = await businessManager.findBusinesses();
+    //
+    res.send(businesses);
+  } catch(error) {
+    res.status(400).send({ message: error.message });
+  }
+});
+
+router.get(PATH + '/businesses/:id', auth, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const business = await businessManager.getBusiness(id);
+    //
+    res.send(business);
+  } catch(error) {
+    res.status(400).send({ message: error.message });
+  }
+});
+
+router.put(PATH + '/businesses/:id', auth, async (req, res) => {
+  const PICK_FIELDS = ["name", "email", "phone", "isActive"];
+  const businessObj = lodash.pick(req.body, PICK_FIELDS);
+  const { id } = req.params;
+  //
+  try {
+    const business = await businessManager.updateBusiness(id, businessObj);
+    //
+    res.send(business);
+  } catch(error) {
+    res.status(400).send({ message: error.message });
+  }
+});
+
+router.delete(PATH + '/businesses/:id', auth, async (req, res) => {
+  const { id } = req.params;
+  //
+  try {
+    const business = await businessManager.deleteBusiness(id);
+    //
+    res.send(business);
+  } catch(error) {
+    res.status(400).send({ message: error.message });
+  }
+});
+
+module.exports = router;

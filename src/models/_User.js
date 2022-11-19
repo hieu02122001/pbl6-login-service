@@ -51,6 +51,10 @@ const userSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Role'
   },
+  businesses: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Business'
+  }],
   isActive: {
     type: Boolean,
     required: true,
@@ -67,6 +71,8 @@ const userSchema = new mongoose.Schema({
       required: true
     }
   }],
+}, {
+  timestamps: true
 });
 // # virtual field
 userSchema.virtual('fullName').get(function() {

@@ -3,6 +3,7 @@ const lodash = require('lodash');
 require('./models/database/mongoose');
 const userRouter = require('./routers/web-user-manager');
 const roleRouter = require('./routers/web-role-manager');
+const business = require('./routers/web-business-manager');
 const taskRouter = require('./routers/Task');
 const cors = require('cors');
 
@@ -14,6 +15,7 @@ app.use(express.json());
 //
 app.use(userRouter);
 app.use(roleRouter);
+app.use(business);
 app.use(taskRouter);
 //
 app.listen(PORT, () => {
