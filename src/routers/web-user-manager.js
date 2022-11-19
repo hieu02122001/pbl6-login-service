@@ -101,8 +101,11 @@ router.post(PATH + '/sign-up', async (req, res) => {
 // ------------------------------------------------------------------------------------
 
 router.get(PATH + '/me', auth, async (req, res) => {
+  const id = req.user._id;
   try {
-    res.send(req.user);
+    const user = await userManager.getUser(id);
+    //
+    res.send(user);
   } catch(error) {
     res.status(400).send({ message: error.message });
   }
