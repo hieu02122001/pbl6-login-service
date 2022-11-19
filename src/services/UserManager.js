@@ -2,11 +2,13 @@ const lodash = require('lodash');
 const { User } = require('../models/_User');
 const { RoleManager } = require('./RoleManager');
 const jwt = require('jsonwebtoken');
+const rabbitMQ = require('../config/RabbitMQ');
 
 function UserManager(params) {};
 
 const roleManager = new RoleManager();
 //
+const createChannelRabbitMQ = new rabbitMQ.RabbitMQ();
 
 UserManager.prototype.findUsers = async function(criteria, more) {
   const queryObj = {
@@ -74,6 +76,16 @@ UserManager.prototype.createUser = async function(userObj, more) {
   //
   await user.save();
   output.user = user;
+  //
+  const message = {
+    "Id": user.id,
+    "Name": user.firstName + " " + user.lastName,
+    "Email": user.email
+  }
+  const severity = 'UserCreatedIntergrationEvent';
+  const exchange = 'booking';
+  
+  createChannelRabbitMQ.createChannelRabbitMQ(severity, exchange, message);
   //
   return output;
 };
