@@ -24,8 +24,15 @@ router.post(PATH + '/businesses', async (req, res) => {
 });
 
 router.get(PATH + '/businesses', auth, async (req, res) => {
+  const { query } = req;
   try {
-    const businesses = await businessManager.findBusinesses();
+    const criteria = {};
+    // pagination
+    if(query && query.page) {
+      lodash.set(criteria, "page", query.page);
+    }
+    //
+    const businesses = await businessManager.findBusinesses(criteria);
     //
     res.send(businesses);
   } catch(error) {

@@ -21,10 +21,17 @@ BusinessManager.prototype.findBusinesses = async function(criteria, more) {
   for (let i = 0; i < businesses.length; i++) {
     businesses[i] = await this.wrapExtraToBusiness(businesses[i].toJSON());
   }
+  // pagination
+  const DEFAULT_LIMIT = 6;
+  const page = lodash.get(criteria, "page") || 1;
+  const _start = DEFAULT_LIMIT * (page -1);
+  const _end = DEFAULT_LIMIT * page;
+  const paginatedBusinesses = lodash.slice(businesses, _start, _end);
   //
   const output = {
-    rows: businesses,
-    count: businesses.length
+    count: businesses.length,
+    page: page,
+    rows: paginatedBusinesses,
   }
   return output;
 };
