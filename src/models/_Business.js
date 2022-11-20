@@ -1,11 +1,17 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const lodash = require('lodash');
+const { slug } = require('../utilities/Utilities');
 //
 const businessSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
+    trim: true,
+  },
+  slug: {
+    type: String,
+    required:false,
     trim: true,
   },
   email: {
@@ -40,6 +46,15 @@ const businessSchema = new mongoose.Schema({
   }
 }, {
   timestamps: true
+});
+// # Middle-wares
+// 
+businessSchema.pre('save', async function (next) {
+  const business = this;
+  //
+  business.slug = slug(business.name);
+  //
+  next();
 });
 //
 const Business = mongoose.model('Business', businessSchema);

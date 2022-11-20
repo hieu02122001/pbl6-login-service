@@ -69,6 +69,8 @@ BusinessManager.prototype.updateBusiness = async function(businessId, businessOb
     throw new Error(`Not found business with id [${businessId}]!`);
   }
   //
+  await business.save();
+  //
   return business;
 };
 

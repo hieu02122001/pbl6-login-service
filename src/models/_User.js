@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const lodash = require('lodash');
+const { slug } = require('../utilities/Utilities');
 //
 const HASH_TIMES = 8;
 //
@@ -14,6 +15,11 @@ const userSchema = new mongoose.Schema({
   lastName: {
     type: String,
     required: true,
+    trim: true,
+  },
+  slug: {
+    type: String,
+    required:false,
     trim: true,
   },
   email: {
@@ -94,7 +100,7 @@ userSchema.statics.findByCredentials = async (email, password) => {
 }
 //
 userSchema.methods.toJSON = function () {
-  const PICK_FIELDS = ["_id", "firstName", "lastName", "fullName", "email", "phone", "avatar", "gender", "roleId", "businesses"];
+  const PICK_FIELDS = ["_id", "firstName", "lastName", "fullName", "slug", "email", "phone", "avatar", "gender", "roleId", "businesses"];
   //
   const user = this;
   const userObject = lodash.pick(user, PICK_FIELDS);
@@ -106,9 +112,9 @@ userSchema.methods.toJSON = function () {
 userSchema.pre('save', async function (next) {
   const user = this;
   //
-  if (user.isModified('password')) {
-    user.password = await bcrypt.hash(user.password, HASH_TIMES);
-  }
+  user.password = await bcrypt.hash(user.password, HASH_TIMES);
+  //
+  user.slug = slug(user.fullName);
   //
   next();
 });

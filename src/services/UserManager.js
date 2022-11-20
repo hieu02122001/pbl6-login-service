@@ -151,6 +151,7 @@ UserManager.prototype.updateUser = async function(userId, userObj, more) {
   if (!user) {
     throw new Error(`Not found user with id [${userId}]!`);
   }
+  await user.save();
   //
   return user;
 };
