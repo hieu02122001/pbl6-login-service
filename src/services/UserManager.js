@@ -4,6 +4,7 @@ const { Business } = require('../models/_Business');
 const { RoleManager } = require('./RoleManager');
 const jwt = require('jsonwebtoken');
 const rabbitMQ = require('../config/RabbitMQ');
+const { mongoose } = require('mongoose');
 
 function UserManager(params) {
   this._businessManager = params.businessManager
@@ -17,6 +18,17 @@ UserManager.prototype.findUsers = async function(criteria, more) {
   const queryObj = {
     isDeleted: false
   };
+  // Build query
+  // Role Id
+  const roleId = lodash.get(criteria, "roleId");
+  if(mongoose.Types.ObjectId.isValid(roleId)) {
+    lodash.set(queryObj, "roleId", mongoose.Types.ObjectId(roleId));
+  }
+  // Business Id
+  const businessId = lodash.get(criteria, "businessId");
+  if(mongoose.Types.ObjectId.isValid(businessId)) {
+    lodash.set(queryObj, "businesses", mongoose.Types.ObjectId(businessId));
+  }
   //
   const users = await User.find(queryObj);
   for (let i = 0; i < users.length; i++) {
@@ -56,13 +68,9 @@ UserManager.prototype.wrapExtraToUser = async function(userObj, more) {
   const roleId = lodash.get(userObj, "roleId");
   if (roleId) {
     const role = await roleManager.getRole(roleId);
-    if (more && more.forGenerateToken === true) {
-      userObj.role = role.name
-    } else {
-      userObj.role = {
-        id: role._id,
-        name: role.name
-      }
+    userObj.role = {
+      id: role._id,
+      name: role.name
     }
   }
   // business

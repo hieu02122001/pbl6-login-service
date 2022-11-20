@@ -30,6 +30,15 @@ router.get(PATH + '/users', auth, async (req, res) => {
   const { query } = req;
   try {
     const criteria = {};
+    // roleId
+    if(query && query.roleId) {
+      lodash.set(criteria, "roleId", query.roleId);
+    }
+    // businessId
+    if(query && query.businessId) {
+      lodash.set(criteria, "businessId", query.businessId);
+    }
+    // search: "name"
     // pagination
     if(query && query.page) {
       lodash.set(criteria, "page", query.page);

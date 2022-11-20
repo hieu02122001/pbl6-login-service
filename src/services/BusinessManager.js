@@ -11,9 +11,9 @@ BusinessManager.prototype.findBusinesses = async function(criteria, more) {
     isDeleted: false
   };
   // Build query
-  let idInList = lodash.get(criteria, "ids");
+  // Id in list
+  const idInList = lodash.get(criteria, "ids");
   if(idInList) {
-    //
     lodash.set(queryObj, "_id", { $in: idInList });
   }
   //
