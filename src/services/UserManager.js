@@ -22,10 +22,17 @@ UserManager.prototype.findUsers = async function(criteria, more) {
   for (let i = 0; i < users.length; i++) {
     users[i] = await this.wrapExtraToUser(users[i].toJSON(), more);
   }
+  // pagination
+  const DEFAULT_LIMIT = 6;
+  const page = lodash.get(criteria, "page") || 1;
+  const _start = DEFAULT_LIMIT * (page -1);
+  const _end = DEFAULT_LIMIT * page;
+  const paginatedUsers = lodash.slice(users, _start, _end);
   //
   const output = {
-    rows: users,
-    count: users.length
+    count: users.length,
+    page: page,
+    rows: paginatedUsers,
   }
   return output;
 };

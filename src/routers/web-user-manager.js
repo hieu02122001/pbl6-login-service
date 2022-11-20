@@ -27,8 +27,15 @@ router.post(PATH + '/users', async (req, res) => {
 });
 
 router.get(PATH + '/users', auth, async (req, res) => {
+  const { query } = req;
   try {
-    const users = await userManager.findUsers();
+    const criteria = {};
+    // pagination
+    if(query && query.page) {
+      lodash.set(criteria, "page", query.page);
+    }
+    //
+    const users = await userManager.findUsers(criteria);
     //
     res.send(users);
   } catch(error) {
