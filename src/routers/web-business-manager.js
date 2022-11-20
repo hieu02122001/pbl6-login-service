@@ -3,13 +3,11 @@ const lodash = require('lodash');
 const router = new express.Router();
 const { User } = require('../models/_User');
 const { Business } = require('../models/_Business');
-const { UserManager } = require('../services/UserManager');
 const { BusinessManager } = require('../services/BusinessManager');
 const { auth } = require('../middleware/auth');
 
 const PATH = '/api/v1';
 
-const userManager = new UserManager();
 const businessManager = new BusinessManager();
 
 router.post(PATH + '/businesses', async (req, res) => {

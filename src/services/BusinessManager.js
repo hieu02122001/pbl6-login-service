@@ -10,6 +10,12 @@ BusinessManager.prototype.findBusinesses = async function(criteria, more) {
   const queryObj = {
     isDeleted: false
   };
+  // Build query
+  let idInList = lodash.get(criteria, "ids");
+  if(idInList) {
+    //
+    lodash.set(queryObj, "_id", { $in: idInList });
+  }
   //
   const businesses = await Business.find(queryObj);
   for (let i = 0; i < businesses.length; i++) {

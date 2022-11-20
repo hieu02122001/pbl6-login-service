@@ -1,10 +1,13 @@
 const lodash = require('lodash');
 const { User } = require('../models/_User');
+const { Business } = require('../models/_Business');
 const { RoleManager } = require('./RoleManager');
 const jwt = require('jsonwebtoken');
 const rabbitMQ = require('../config/RabbitMQ');
 
-function UserManager(params) {};
+function UserManager(params) {
+  this._businessManager = params.businessManager
+};
 
 const roleManager = new RoleManager();
 //
@@ -56,15 +59,42 @@ UserManager.prototype.wrapExtraToUser = async function(userObj, more) {
     }
   }
   // business
-  userObj.businessId = "4ec43428-5c04-4447-9811-7ed424d7ad52";
+  let businesses = lodash.get(userObj, "businesses");
+  if (lodash.isArray(businesses) && businesses.length > 0) {
+    if (more && more.forGenerateToken === true) {
+      userObj.businessId = businesses[0];
+    } else {
+      const criteria = {};
+      criteria.ids = lodash.map(businesses, function(item) {
+        return item._id;
+      });
+      businesses = await this._businessManager.findBusinesses(criteria);
+      businesses.rows = lodash.map(businesses.rows, function(item) {
+        return lodash.pick(item, ["id", "name", "email", "phone"]);
+      });
+      userObj.businesses = businesses.rows;
+    }
+  }
   return lodash.omit(userObj, ["_id", "roleId"]);
 };
 
 UserManager.prototype.createUser = async function(userObj, more) {
   // check if roleId is valid
   await roleManager.getRole(userObj.roleId);
+  // omit businessId
+  const businessId = userObj.businessId;
+  userObj = lodash.omit(userObj, "businessId");
+  let user = new User(userObj);
+  await user.save();
+  // attach business to user
+  const userId = lodash.get(user, "_id").toString();
+  try {
+    user = await this.attachBusinessToUser(userId, businessId);
+  } catch (error) {
+    await User.findByIdAndDelete(userId);
+    throw error;
+  }
   //
-  const user = new User(userObj);
   const output = {};
   //
   if (more && more.generateAuthToken === true) {
@@ -74,18 +104,17 @@ UserManager.prototype.createUser = async function(userObj, more) {
     output.token = token;
   };
   //
-  await user.save();
   output.user = user;
   //
-  const message = {
-    "Id": user.id,
-    "Name": user.firstName + " " + user.lastName,
-    "Email": user.email
-  }
-  const severity = 'UserCreatedIntergrationEvent';
-  const exchange = 'booking';
+  // const message = {
+  //   "Id": user.id,
+  //   "Name": user.firstName + " " + user.lastName,
+  //   "Email": user.email
+  // }
+  // const severity = 'UserCreatedIntergrationEvent';
+  // const exchange = 'booking';
   
-  createChannelRabbitMQ.createChannelRabbitMQ(severity, exchange, message);
+  // createChannelRabbitMQ.createChannelRabbitMQ(severity, exchange, message);
   //
   return output;
 };
@@ -123,6 +152,18 @@ UserManager.prototype.deleteUser = async function(userId, more) {
   return user;
 };
 
+UserManager.prototype.attachBusinessToUser = async function (userId, businessId) {
+  await this._businessManager.getBusiness(businessId);
+  await this.getUser(userId);
+  //
+  await Business.findByIdAndUpdate(businessId, {
+    $push: { users: userId }
+  }, { new: true });
+  //
+  return await User.findByIdAndUpdate(userId, {
+    $push: { businesses: businessId }
+  }, { new: true })
+};
 //
 
 module.exports = { UserManager };

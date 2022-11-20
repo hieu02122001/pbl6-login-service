@@ -94,7 +94,7 @@ userSchema.statics.findByCredentials = async (email, password) => {
 }
 //
 userSchema.methods.toJSON = function () {
-  const PICK_FIELDS = ["_id", "firstName", "lastName", "fullName", "email", "phone", "avatar", "gender", "roleId", "isActive", "isDeleted"];
+  const PICK_FIELDS = ["_id", "firstName", "lastName", "fullName", "email", "phone", "avatar", "gender", "roleId", "businesses"];
   //
   const user = this;
   const userObject = lodash.pick(user, PICK_FIELDS);

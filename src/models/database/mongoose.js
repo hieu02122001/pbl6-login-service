@@ -4,7 +4,6 @@ const mongoose = require('mongoose');
 const CONNECTION_URL = 'mongodb://tcp-mo4.mogenius.io:33303';
 mongoose.connect(CONNECTION_URL, {
   useNewUrlParser: true,
-  useFindAndModify: false,
   user: "root",
   pass: "123456",
   dbName: "user-service"
