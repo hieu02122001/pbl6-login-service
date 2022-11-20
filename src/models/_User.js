@@ -51,6 +51,10 @@ const userSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Role'
   },
+  businesses: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Business'
+  }],
   isActive: {
     type: Boolean,
     required: true,
@@ -67,6 +71,8 @@ const userSchema = new mongoose.Schema({
       required: true
     }
   }],
+}, {
+  timestamps: true
 });
 // # virtual field
 userSchema.virtual('fullName').get(function() {
@@ -88,7 +94,7 @@ userSchema.statics.findByCredentials = async (email, password) => {
 }
 //
 userSchema.methods.toJSON = function () {
-  const PICK_FIELDS = ["_id", "firstName", "lastName", "fullName", "email", "phone", "avatar", "gender", "roleId", "isActive", "isDeleted"];
+  const PICK_FIELDS = ["_id", "firstName", "lastName", "fullName", "email", "phone", "avatar", "gender", "roleId", "businesses"];
   //
   const user = this;
   const userObject = lodash.pick(user, PICK_FIELDS);

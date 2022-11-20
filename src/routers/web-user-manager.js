@@ -3,14 +3,18 @@ const lodash = require('lodash');
 const router = new express.Router();
 const { User } = require('../models/_User');
 const { UserManager } = require('../services/UserManager');
+const { BusinessManager } = require('../services/BusinessManager');
 const { auth } = require('../middleware/auth');
 
 const PATH = '/api/v1';
 
-const userManager = new UserManager();
+const businessManager = new BusinessManager();
+const userManager = new UserManager({
+  businessManager
+});
 
 router.post(PATH + '/users', async (req, res) => {
-  const PICK_FIELDS = ["firstName", "lastName", "email", "password", "phone", "avatar", "gender", "roleId"];
+  const PICK_FIELDS = ["firstName", "lastName", "email", "password", "phone", "avatar", "gender", "roleId", "businessId"];
   const userObj = lodash.pick(req.body, PICK_FIELDS);
   //
   try {
