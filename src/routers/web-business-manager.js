@@ -31,6 +31,10 @@ router.get(PATH + '/businesses', auth, async (req, res) => {
     if(query && query.page) {
       lodash.set(criteria, "page", query.page);
     }
+    // search: slug/phone/email
+    if(query && query.search) {
+      lodash.set(criteria, "search", query.search);
+    }
     //
     const businesses = await businessManager.findBusinesses(criteria);
     //

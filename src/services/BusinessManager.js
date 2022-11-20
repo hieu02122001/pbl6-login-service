@@ -1,6 +1,7 @@
 const lodash = require('lodash');
 const { User } = require('../models/_User');
 const { Business } = require('../models/_Business');
+const { slug } = require('../utilities/Utilities');
 
 function BusinessManager(params) {};
 
@@ -15,6 +16,16 @@ BusinessManager.prototype.findBusinesses = async function(criteria, more) {
   const idInList = lodash.get(criteria, "ids");
   if(idInList) {
     lodash.set(queryObj, "_id", { $in: idInList });
+  }
+  // Search: slug/phone/email
+  let searchInfo = lodash.get(criteria, "search");
+  if(searchInfo) {
+    searchInfo = slug(searchInfo);
+    lodash.set(queryObj, "$or", [
+      { "slug": { "$regex": searchInfo } },
+      { "phone": { "$regex": searchInfo } },
+      { "email": { "$regex": searchInfo } },
+    ])
   }
   //
   const businesses = await Business.find(queryObj);

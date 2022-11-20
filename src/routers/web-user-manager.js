@@ -38,7 +38,10 @@ router.get(PATH + '/users', auth, async (req, res) => {
     if(query && query.businessId) {
       lodash.set(criteria, "businessId", query.businessId);
     }
-    // search: "name"
+    // search: slug/phone/email
+    if(query && query.search) {
+      lodash.set(criteria, "search", query.search);
+    }
     // pagination
     if(query && query.page) {
       lodash.set(criteria, "page", query.page);

@@ -5,6 +5,7 @@ const { RoleManager } = require('./RoleManager');
 const jwt = require('jsonwebtoken');
 const rabbitMQ = require('../config/RabbitMQ');
 const { mongoose } = require('mongoose');
+const { slug } = require('../utilities/Utilities');
 
 function UserManager(params) {
   this._businessManager = params.businessManager
@@ -28,6 +29,16 @@ UserManager.prototype.findUsers = async function(criteria, more) {
   const businessId = lodash.get(criteria, "businessId");
   if(mongoose.Types.ObjectId.isValid(businessId)) {
     lodash.set(queryObj, "businesses", mongoose.Types.ObjectId(businessId));
+  }
+  // Search: slug/phone/email
+  let searchInfo = lodash.get(criteria, "search");
+  if(searchInfo) {
+    searchInfo = slug(searchInfo);
+    lodash.set(queryObj, "$or", [
+      { "slug": { "$regex": searchInfo } },
+      { "phone": { "$regex": searchInfo } },
+      { "email": { "$regex": searchInfo } },
+    ])
   }
   //
   const users = await User.find(queryObj);
@@ -122,7 +133,7 @@ UserManager.prototype.createUser = async function(userObj, more) {
   output.user = user;
   //
   // const message = {
-  //   "Id": user.id,
+  //   "Id": user._id,
   //   "Name": user.firstName + " " + user.lastName,
   //   "Email": user.email
   // }
