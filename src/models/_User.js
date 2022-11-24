@@ -112,7 +112,9 @@ userSchema.methods.toJSON = function () {
 userSchema.pre('save', async function (next) {
   const user = this;
   //
-  user.password = await bcrypt.hash(user.password, HASH_TIMES);
+  if (user.isModified('password')) {
+    user.password = await bcrypt.hash(user.password, HASH_TIMES);
+  }
   //
   user.slug = slug(user.fullName);
   //

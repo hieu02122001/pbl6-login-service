@@ -115,7 +115,9 @@ UserManager.prototype.createUser = async function(userObj, more) {
   // attach business to user
   const userId = lodash.get(user, "_id").toString();
   try {
-    user = await this.attachBusinessToUser(userId, businessId);
+    if (businessId) {
+      user = await this.attachBusinessToUser(userId, businessId);
+    }
   } catch (error) {
     await User.findByIdAndDelete(userId);
     throw error;
@@ -132,15 +134,15 @@ UserManager.prototype.createUser = async function(userObj, more) {
   //
   output.user = user;
   //
-  // const message = {
-  //   "Id": user._id,
-  //   "Name": user.firstName + " " + user.lastName,
-  //   "Email": user.email
-  // }
-  // const severity = 'UserCreatedIntergrationEvent';
-  // const exchange = 'booking';
+  const message = {
+    "Id": user._id,
+    "Name": user.firstName + " " + user.lastName,
+    "Email": user.email
+  }
+  const severity = 'UserCreatedIntergrationEvent';
+  const exchange = 'booking';
   
-  // createChannelRabbitMQ.createChannelRabbitMQ(severity, exchange, message);
+  createChannelRabbitMQ.createChannelRabbitMQ(severity, exchange, message);
   //
   return output;
 };
