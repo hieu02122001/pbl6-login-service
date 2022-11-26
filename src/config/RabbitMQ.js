@@ -7,6 +7,10 @@ RabbitMQ.prototype.createChannelRabbitMQ = async (severity, exchange, message) =
 
   var channel = await conn.createChannel();
 
+  channel.assertExchange(exchange, 'direct', {
+    durable: true,
+  });
+
   channel.publish(exchange, severity, Buffer.from(JSON.stringify(message)),{
     type: 'direct',
     persistent: true
