@@ -3,7 +3,7 @@ const { User } = require('../models/_User');
 const { Business } = require('../models/_Business');
 const { RoleManager } = require('./RoleManager');
 const jwt = require('jsonwebtoken');
-const rabbitMQ = require('../config/RabbitMQ');
+const { RabbitMQ } = require('../config/Publisher');
 const { mongoose } = require('mongoose');
 const { slug } = require('../utilities/Utilities');
 
@@ -13,7 +13,7 @@ function UserManager(params) {
 
 const roleManager = new RoleManager();
 //
-const createChannelRabbitMQ = new rabbitMQ.RabbitMQ();
+const createChannelRabbitMQ = new RabbitMQ();
 
 UserManager.prototype.findUsers = async function(criteria, more) {
   const queryObj = {
@@ -193,6 +193,12 @@ UserManager.prototype.attachBusinessToUser = async function (userId, businessId)
     $push: { businesses: businessId }
   }, { new: true })
 };
+
+UserManager.prototype.attachBusinessToUserByRabbitMQ = async function (msg) {
+  const userId = msg.UserId;
+  const businessId = msg.BusinessId;
+  return this.attachBusinessToUser(userId, businessId);
+}
 //
 
 module.exports = { UserManager };

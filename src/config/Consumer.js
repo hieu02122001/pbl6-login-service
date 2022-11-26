@@ -1,5 +1,10 @@
 const amqplib = require('amqplib');
+const { BusinessManager } = require('../services/BusinessManager');
+const { UserManager } = require('../services/UserManager');
 const lodash = require('lodash');
+
+const businessManager = new BusinessManager();
+const userManager = new UserManager({businessManager});
 
 function Consumer(params) { };
 
@@ -18,15 +23,27 @@ const consumer = async (severity) => {
   for (const item of severity) {
     channel.bindQueue(queue, exchange, item);
   }
-  channel.consume(queue, (msg) => {
-    if (msg !== null) {
-      console.log('Event: ',  msg.fields.routingKey)
-      console.log('Recieved:', msg.content.toString());
-      
+  channel.consume(queue, async (msg) => {
+    try {
+      if (msg !== null) {
+        const MAPPING_FUNCTION = {
+          'BusinessUpdatedIntegrationEvent': userManager.attachBusinessToUserByRabbitMQ
+        }
+        const consumerFunction = MAPPING_FUNCTION[msg.fields.routingKey];
+        if (consumerFunction) {
+          await consumerFunction.call(userManager, JSON.parse(msg.content.toString()));
+        }
+        //
+        channel.ack(msg);
+      } else {
+        console.log('Consumer cancelled by server');
+      }
+    } catch (error) {
+      console.log({ message: error.message });
       channel.ack(msg);
-    } else {
-      console.log('Consumer cancelled by server');
     }
+    
+    
   });
 };
 
