@@ -85,8 +85,17 @@ userSchema.virtual('fullName').get(function() {
   return `${this.firstName} ${this.lastName}`;
 });
 // # Methods
-userSchema.statics.findByCredentials = async (email, password) => {
-  const user = await User.findOne({ email });
+userSchema.statics.findByCredentials = async (email, password, more) => {
+  const { role } = more;
+  const MAPPING_ROLE = {
+    CLIENT : ["636723d347707eeadf80eb59"],
+    ADMIN : ["63671e8c83f50d47ea00f803", "636723c71f1cbcef36804e82"]
+  }
+  const user = await User.findOne({ 
+    email,
+    roleId: {
+      $in: MAPPING_ROLE[role]
+    } });
   if (!user) {
     throw new Error('Unable to login!');
   }

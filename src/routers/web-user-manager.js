@@ -92,10 +92,10 @@ router.delete(PATH + '/users/:id', auth, async (req, res) => {
   }
 });
 
-router.post(PATH + '/users/login', async (req, res) => {
+router.post(PATH + '/users/admin/login', async (req, res) => {
   const { email, password } = req.body;
   try {
-    const user = await User.findByCredentials(email, password);
+    const user = await User.findByCredentials(email, password, {role: "ADMIN"});
     //
     const userId = lodash.get(user, "_id");
     const token = await userManager.generateAuthToken(userId);
@@ -108,10 +108,27 @@ router.post(PATH + '/users/login', async (req, res) => {
   }
 });
 
-router.post(PATH + '/sign-up', async (req, res) => {
+router.post(PATH + '/users/client/login', async (req, res) => {
+  const { email, password } = req.body;
   try {
-    const PICK_FIELDS = ["firstName", "lastName", "email", "password", "phone", "avatar", "gender", "roleId"];
+    const user = await User.findByCredentials(email, password, {role: "CLIENT"});
+    //
+    const userId = lodash.get(user, "_id");
+    const token = await userManager.generateAuthToken(userId);
+    user.refreshTokens = user.refreshTokens.concat({ token });
+    await user.save();
+    //
+    res.send({ user, token });
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+});
+
+router.post(PATH + '/client/sign-up', async (req, res) => {
+  try {
+    const PICK_FIELDS = ["firstName", "lastName", "email", "password", "phone", "avatar", "gender"];
     const userObj = lodash.pick(req.body, PICK_FIELDS);
+    lodash.set(userObj, "roleId", "636723d347707eeadf80eb59");
     //
     const { user, token } = await userManager.createUser(userObj, { generateAuthToken: true });
     //
