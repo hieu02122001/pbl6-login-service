@@ -153,7 +153,7 @@ UserManager.prototype.generateAuthToken = async function(userId, more) {
   //
   const token = jwt.sign({
   ...user
-  }, AUTH_KEY, {expiresIn: 864000});
+  }, AUTH_KEY);
   //
   return token;
 };
