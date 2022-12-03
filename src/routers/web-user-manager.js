@@ -5,6 +5,7 @@ const { User } = require('../models/_User');
 const { UserManager } = require('../services/UserManager');
 const { BusinessManager } = require('../services/BusinessManager');
 const { auth } = require('../middleware/auth');
+const { sendEmail } = require('../utilities/Utilities');
 
 const PATH = '/api/v1';
 
@@ -165,5 +166,30 @@ router.post(PATH + '/me/logout', auth, async (req, res) => {
   }
 });
 
+// ------------------------------------------------------------------------------------
+
+router.get(PATH + '/reset-password', async (req, res) => {
+  const { email } = req.body;
+  try {
+    if (email) {
+      res.send(await sendEmail(email));
+    }
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+});
+
+router.get(PATH + '/reset-password/:id', async (req, res) => {
+  const { id } = req.params;
+  const { password } = req.body;
+  //
+  try {
+    const user = await userManager.updateUser(id, { password });
+    //
+    res.send(user);
+  } catch(error) {
+    res.status(400).send({ message: error.message });
+  }
+});
 
 module.exports = router;
