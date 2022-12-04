@@ -4,6 +4,7 @@ require('./models/database/mongoose');
 const { consumer } = require('./config/Consumer')
 const userRouter = require('./routers/web-user-manager');
 const roleRouter = require('./routers/web-role-manager');
+const packageRouter = require('./routers/web-package-manager');
 const businessRouter = require('./routers/web-business-manager');
 const cors = require('cors');
 
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use(userRouter);
 app.use(businessRouter);
 app.use(roleRouter);
+app.use(packageRouter);
 //
 const severity = [
   'BusinessUpdatedIntegrationEvent'
