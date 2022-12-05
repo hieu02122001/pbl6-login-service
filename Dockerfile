@@ -11,4 +11,5 @@ RUN npm install --production
 COPY . .
 
 EXPOSE 8080
+RUN npm install express
 CMD [ "npm", "run", "server" ]
