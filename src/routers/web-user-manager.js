@@ -168,18 +168,23 @@ router.post(PATH + '/me/logout', auth, async (req, res) => {
 
 // ------------------------------------------------------------------------------------
 
-router.get(PATH + '/reset-password', async (req, res) => {
+router.post(PATH + '/reset-password', async (req, res) => {
   const { email } = req.body;
   try {
     if (email) {
-      res.send(await sendEmail(email));
+      const user = await User.findOne({ email });
+      if (!user) {
+        throw new Error(`Not found user with email [${email}]`);
+      }
+      //
+      res.send(await sendEmail(user._id));
     }
   } catch (error) {
     res.status(400).send({ message: error.message });
   }
 });
 
-router.get(PATH + '/reset-password/:id', async (req, res) => {
+router.post(PATH + '/reset-password/:id', async (req, res) => {
   const { id } = req.params;
   const { password } = req.body;
   //

@@ -12,7 +12,7 @@ const slug = function (str, more) {
   })
 }
 
-const sendEmail = async (email) => {
+const sendEmail = async (userId) => {
   const transporter = nodemailer.createTransport({
       host: "smtp.ethereal.email",
       service: "gmail",
@@ -25,13 +25,7 @@ const sendEmail = async (email) => {
   });
   //
   try {
-    const user = await User.findOne({ email });
-    if (!user) {
-      throw new Error(`Not found user with email [${email}]`);
-    }
-    //
-    const userId = lodash.get(user, "_id");
-    const UI_URL = "";
+    const UI_URL = "http://192.168.10.18:3000/forgot-password";
     await transporter.sendMail({
         from: "thanhduong10022001@gmail.com",
         to: "trunghieuvan01@gmail.com",

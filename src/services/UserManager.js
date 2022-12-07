@@ -159,12 +159,17 @@ UserManager.prototype.generateAuthToken = async function(userId, more) {
 };
 
 UserManager.prototype.updateUser = async function(userId, userObj, more) {
+  const passwordChange = lodash.get(userObj, "password");
+  lodash.unset(userObj, "password");
   const user = await User.findByIdAndUpdate(userId, userObj, { new: true, runValidators: true });
   //
   if (!user) {
     throw new Error(`Not found user with id [${userId}]!`);
   }
-  await user.save();
+  if (passwordChange) {
+    user.password = passwordChange;
+    await user.save();
+  }
   //
   return user;
 };
