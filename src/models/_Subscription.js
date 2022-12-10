@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const lodash = require('lodash');
 const validator = require('validator');
 //
 //
@@ -22,13 +23,17 @@ const subscriptionSchema = new mongoose.Schema({
   price: {
     type: Number,
     required: true,
+  },
+  isDone: {
+    type: Boolean,
+    default: false,
   }
 }, {
   timestamps: true
 });
 //
 subscriptionSchema.methods.toJSON = function () {
-  const PICK_FIELDS = ["_id", "businessId", "startTime", "endTime", "packageId", "price", "createdAt", "updatedAt"];
+  const PICK_FIELDS = ["_id", "businessId", "business", "startTime", "endTime", "packageId", "package", "price", "done", "createdAt", "updatedAt"];
   //
   const subscription = this;
   const subscriptionObject = lodash.pick(subscription, PICK_FIELDS);
