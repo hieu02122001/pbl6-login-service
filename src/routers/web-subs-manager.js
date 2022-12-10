@@ -11,6 +11,9 @@ const subscriptionManager = new SubscriptionManager();
 router.get(PATH + '/subscriptions', async (req, res) => {
   try {
     const subscriptions = await subscriptionManager.findSubscriptions();
+    for (const i in subscriptions.rows) {
+      subscriptions.rows[i] = await subscriptionManager.wrapExtraToSubscriptions(subscriptions.rows[i]);
+    }
     //
     res.send(subscriptions);
   } catch(error) {
@@ -19,11 +22,11 @@ router.get(PATH + '/subscriptions', async (req, res) => {
 });
 
 router.post(PATH + '/subscriptions', async (req, res) => {
-  const PICK_FIELDS = ["businessId", "startTime", "packageId", "price"];
+  const PICK_FIELDS = ["businessId", "startTime", "packageId"];
   const subscriptionObj = lodash.pick(req.body, PICK_FIELDS);
   //
   try {
-    const { subscription } = await subscriptionManager.createSubscription(subscriptionObj);
+    const subscription = await subscriptionManager.createSubscription(subscriptionObj);
     //
     res.send(subscription);
   } catch(error) {

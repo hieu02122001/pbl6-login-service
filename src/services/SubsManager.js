@@ -19,6 +19,13 @@ SubscriptionManager.prototype.findSubscriptions = async function(criteria, more)
   return output;
 };
 
+SubscriptionManager.prototype.wrapExtraToSubscriptions = async function(userObj, more) {
+  const package = await packageManager.getPackage(userObj.packageId);
+  userObj.package = lodash.pick(package, ["name"]);
+  //
+  return userObj;
+}
+
 SubscriptionManager.prototype.getSubscription = async function(subscriptionId, more) {
   const subscription = await Subscription.findById(subscriptionId);
   //
@@ -31,15 +38,19 @@ SubscriptionManager.prototype.getSubscription = async function(subscriptionId, m
 
 SubscriptionManager.prototype.createSubscription = async function(subscriptionObj, more) {
   const package = await packageManager.getPackage(subscriptionObj.packageId);
-  subscriptionObj.startTime = subscriptionObj.startTime || new Date();
+  const startTime = subscriptionObj.startTime || new Date();
   // set endTime
-  subscriptionObj.endTime = moment(subscriptionObj.startTime).add(package.months, "months");
+  const endTime = moment(startTime).add(package.months, "months").startOf('day');
   // convert to ISOString
-  subscriptionObj.startTime = subscriptionObj.startTime.toISOString();
-  subscriptionObj.endTime = subscriptionObj.endTime.toISOString();
-  // const subscription = await Subscription.create(subscriptionObj);
+  subscriptionObj.startTime = startTime;
+  subscriptionObj.endTime = endTime.toISOString();
   //
-  return "subscription";
+  subscriptionObj.price = package.price;
+  //
+  const subscription = await Subscription.create(subscriptionObj);
+  await subscription.save();
+  //
+  return subscription;
 };
 
 //
