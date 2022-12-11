@@ -1,5 +1,6 @@
 const lodash = require('lodash');
 const { User } = require('../models/_User');
+const { Subscription } = require('../models/_Subscription');
 const { Business } = require('../models/_Business');
 const { slug } = require('../utilities/Utilities');
 
@@ -67,6 +68,12 @@ BusinessManager.prototype.getBusiness = async function(businessId, more) {
 BusinessManager.prototype.wrapExtraToBusiness = async function(businessObj, more) {
   // id
   businessObj.id = lodash.get(businessObj, "_id").toString();
+  // endTime of subscription
+  const subs = await Subscription.find({businessId: businessObj.id}).sort([['endTime', -1]]);
+  businessObj.endTime = null;
+  if (subs.length > 0) {
+    businessObj.endTime = subs[0].endTime;
+  }
   return lodash.omit(businessObj, ["_id"]);
 };
 
