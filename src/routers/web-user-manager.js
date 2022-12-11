@@ -97,6 +97,13 @@ router.post(PATH + '/users/admin/login', async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await User.findByCredentials(email, password, {role: "ADMIN"});
+    // if Local Admin it should have business activated
+    if (user.roleId.toString() === '636723c71f1cbcef36804e82') {
+      const business = await businessManager.getBusiness(user.businesses[0]._id);
+      if (business.isActive === false) {
+        throw new Error('BusinessInactivated!');
+      }
+    }
     //
     const userId = lodash.get(user, "_id");
     const token = await userManager.generateAuthToken(userId);

@@ -97,12 +97,12 @@ userSchema.statics.findByCredentials = async (email, password, more) => {
       $in: MAPPING_ROLE[role]
     } });
   if (!user) {
-    throw new Error('Unable to login!');
+    throw new Error('This email doesn\'t exist!');
   }
   //
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) {
-    throw new Error('Unable to login!');
+    throw new Error('Wrong password!');
   }
   //
   return user;
