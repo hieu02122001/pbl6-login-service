@@ -36,6 +36,10 @@ router.get(PATH + '/businesses', auth, async (req, res) => {
       lodash.set(criteria, "search", query.search);
     }
     //
+    if(query && query.isActive) {
+      criteria.isActive = query.isActive === "active";
+    }
+    //
     const businesses = await businessManager.findBusinesses(criteria);
     //
     res.send(businesses);

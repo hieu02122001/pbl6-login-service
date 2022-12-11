@@ -28,7 +28,14 @@ BusinessManager.prototype.findBusinesses = async function(criteria, more) {
     ])
   }
   //
-  const businesses = await Business.find(queryObj);
+  const isActive = lodash.get(criteria, "isActive");
+  if (lodash.isBoolean(isActive)) {
+    lodash.set(queryObj, "isActive", isActive);
+  }
+  //
+  const businesses = await Business.find(queryObj)
+    .sort([['createdAt', -1]]);
+  //
   for (let i = 0; i < businesses.length; i++) {
     businesses[i] = await this.wrapExtraToBusiness(businesses[i].toJSON());
   }
@@ -64,6 +71,8 @@ BusinessManager.prototype.wrapExtraToBusiness = async function(businessObj, more
 };
 
 BusinessManager.prototype.createBusiness = async function(businessObj, more) {
+  const PICK_FIELDS = ["name", "email", "phone"];
+  businessObj = lodash.pick(businessObj, PICK_FIELDS);
   const business = new Business(businessObj);
   const output = {};
   //

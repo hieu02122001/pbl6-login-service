@@ -9,8 +9,19 @@ const PATH = '/api/v1';
 const subscriptionManager = new SubscriptionManager();
 
 router.get(PATH + '/subscriptions', async (req, res) => {
+  const { query } = req;
   try {
-    const subscriptions = await subscriptionManager.findSubscriptions();
+    const criteria = {};
+    // pagination
+    if(query && query.page) {
+      lodash.set(criteria, "page", query.page);
+    }
+    //
+    if(query && query.businessId) {
+      lodash.set(criteria, "businessId", query.businessId);
+    }
+    //
+    const subscriptions = await subscriptionManager.findSubscriptions(criteria);
     for (const i in subscriptions.rows) {
       subscriptions.rows[i] = await subscriptionManager.wrapExtraToSubscriptions(subscriptions.rows[i]);
     }

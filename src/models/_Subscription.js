@@ -33,7 +33,7 @@ const subscriptionSchema = new mongoose.Schema({
 });
 //
 subscriptionSchema.methods.toJSON = function () {
-  const PICK_FIELDS = ["_id", "businessId", "business", "startTime", "endTime", "packageId", "package", "price", "done", "createdAt", "updatedAt"];
+  const PICK_FIELDS = ["_id", "businessId", "business", "startTime", "endTime", "packageId", "package", "price", "isDone", "createdAt", "updatedAt"];
   //
   const subscription = this;
   const subscriptionObject = lodash.pick(subscription, PICK_FIELDS);

@@ -41,7 +41,9 @@ UserManager.prototype.findUsers = async function(criteria, more) {
     ])
   }
   //
-  const users = await User.find(queryObj);
+  const users = await User.find(queryObj)
+  .sort([['createdAt', -1]]);
+  //
   for (let i = 0; i < users.length; i++) {
     users[i] = await this.wrapExtraToUser(users[i].toJSON(), more);
   }
