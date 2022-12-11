@@ -62,7 +62,23 @@ SubscriptionManager.prototype.getSubscription = async function(subscriptionId, m
 
 SubscriptionManager.prototype.createSubscription = async function(subscriptionObj, more) {
   const package = await packageManager.getPackage(subscriptionObj.packageId);
-  const startTime = subscriptionObj.startTime || new Date();
+  const businessId = lodash.get(subscriptionObj, "businessId");
+  const business = await businessManager.getBusiness(businessId);
+  // check if business has local User
+  if (business.users.length === 0) {
+    throw new Error("Business doesn't have Local Admin");
+  }
+  //
+  const oldSubs = await this.findSubscriptions({ 
+    businessId,
+    isDone: false
+  });
+  //
+  let startTime = new Date();
+  if (oldSubs.count > 0) {
+    const newestSub = oldSubs.rows[0];
+    startTime = newestSub.endTime;
+  }
   // set endTime
   const endTime = moment(startTime).add(package.months, "months").startOf('day');
   // convert to ISOString
@@ -73,6 +89,8 @@ SubscriptionManager.prototype.createSubscription = async function(subscriptionOb
   //
   const subscription = await Subscription.create(subscriptionObj);
   await subscription.save();
+  // active business
+  await businessManager.updateBusiness(businessId, { isActive: true });
   //
   return subscription;
 };

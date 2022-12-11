@@ -8,7 +8,8 @@ function PackageManager(params) {};
 PackageManager.prototype.findPackages = async function(criteria, more) {
   const queryObj = {};
   //
-  const packages = await Package.find(queryObj);
+  const packages = await Package.find(queryObj)
+    .sort([["_id", 1]]);
   const output = {
     rows: packages,
     count: packages.length
