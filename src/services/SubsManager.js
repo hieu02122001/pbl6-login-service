@@ -1,5 +1,6 @@
 const lodash = require('lodash');
 const { Subscription } = require('../models/_Subscription');
+const { User } = require('../models/_User');
 const { PackageManager } = require('./PackageManager');
 const { BusinessManager } = require('./BusinessManager');
 const moment = require('moment');
@@ -26,6 +27,12 @@ SubscriptionManager.prototype.findSubscriptions = async function(criteria, more)
   const subscriptions = await Subscription.find(queryObj)
     .sort([['endTime', -1]]);
   // pagination
+  if(more && more.pagination === false) {
+    return {
+      count: subscriptions.length,
+      rows: subscriptions
+    }
+  }
   const DEFAULT_LIMIT = 6;
   const page = lodash.get(criteria, "page") || 1;
   const _start = DEFAULT_LIMIT * (page -1);
@@ -93,6 +100,37 @@ SubscriptionManager.prototype.createSubscription = async function(subscriptionOb
   await businessManager.updateBusiness(businessId, { isActive: true });
   //
   return subscription;
+};
+
+SubscriptionManager.prototype.checkExpiredSubs = async function() {
+  const currentTime = new Date();
+  let expiredCount = 0;
+  const expiredList = [];
+  //
+  const availableSubs = await this.findSubscriptions({ isDone: false }, { pagination: false });
+  for (const i in availableSubs.rows) {
+    const sub = availableSubs.rows[i];
+    if(sub.endTime < currentTime) {
+      expiredCount++;
+      // de-active business 
+      const business = await businessManager.updateBusiness(sub.businessId, { isActive: false });
+      // done subscription
+      await Subscription.findByIdAndUpdate(sub._id, { isDone: true }, { new: true, runValidators: true });
+      // remove User token
+      const user = await User.findOne({
+        businessId: sub.businessId,
+        roleId: "636723c71f1cbcef36804e82"
+      });
+      user.refreshTokens = [];
+      user.save();
+      //
+      expiredList.push(business.name + " of " + user.fullName);
+    }
+  }
+  return {
+    expiredCount,
+    expiredList
+  }
 };
 
 //

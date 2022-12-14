@@ -7,6 +7,7 @@ const roleRouter = require('./routers/web-role-manager');
 const packageRouter = require('./routers/web-package-manager');
 const businessRouter = require('./routers/web-business-manager');
 const subsRouter = require('./routers/web-subs-manager');
+const { taskCheckSubs } = require('./utilities/Cron');
 const cors = require('cors');
 
 const app = express();
@@ -20,6 +21,8 @@ app.use(businessRouter);
 app.use(roleRouter);
 app.use(packageRouter);
 app.use(subsRouter);
+//
+taskCheckSubs.start();
 //
 const severity = [
   'BusinessUpdatedIntegrationEvent'
