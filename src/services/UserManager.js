@@ -102,6 +102,10 @@ UserManager.prototype.wrapExtraToUser = async function(userObj, more) {
       });
       userObj.businesses = businesses.rows;
     }
+  } else {
+    if (more && more.forGenerateToken === true) {
+      userObj.businessId = "";
+    }
   }
   return lodash.omit(userObj, ["_id", "roleId"]);
 };
@@ -130,6 +134,7 @@ UserManager.prototype.createUser = async function(userObj, more) {
   if (more && more.generateAuthToken === true) {
     const token = await this.generateAuthToken(user._id);
     user.refreshTokens = user.refreshTokens.concat({ token });
+    await user.save();
     //
     output.token = token;
   };

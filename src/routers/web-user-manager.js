@@ -204,4 +204,14 @@ router.post(PATH + '/reset-password/:id', async (req, res) => {
   }
 });
 
+// ------------------------------------------------------------------------------------
+
+router.get('', async (req, res) => {
+  res.send({ status: "Welcome to user service!"});
+});
+
+router.get(PATH, async (req, res) => {
+  res.send({ status: "Welcome to user service!"});
+});
+
 module.exports = router;
