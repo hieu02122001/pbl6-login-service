@@ -139,11 +139,11 @@ UserManager.prototype.createUser = async function(userObj, more) {
   const message = {
     "Id": user._id,
     "Name": user.firstName + " " + user.lastName,
-    "Email": user.email
+    "BusinessId": user.businessId,
+    "Avatar": user.avatar,
   }
   const severity = 'UserCreatedIntergrationEvent';
   const exchange = 'booking';
-  
   createChannelRabbitMQ.createChannelRabbitMQ(severity, exchange, message);
   //
   return output;
@@ -173,6 +173,15 @@ UserManager.prototype.updateUser = async function(userId, userObj, more) {
     await user.save();
   }
   //
+  const message = {
+    "Id": user.id,
+    "Name": user.firstName + " " + user.lastName,
+    "Avatar": user.avatar
+  }
+  const severity = 'UpdateUserIntegrationEvent';
+  const exchange = 'booking';
+  createChannelRabbitMQ.createChannelRabbitMQ(severity, exchange, message);
+  //
   return user;
 };
 
@@ -184,6 +193,13 @@ UserManager.prototype.deleteUser = async function(userId, more) {
   if (!user) {
     throw new Error(`Not found user with id [${userId}]!`);
   }
+  //
+  const message = {
+    "Id": user.id
+  }
+  const severity = 'DeleteUserIntegrationEvent';
+  const exchange = 'booking';
+  createChannelRabbitMQ.createChannelRabbitMQ(severity, exchange, message);
   //
   return user;
 };
