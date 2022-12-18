@@ -179,7 +179,7 @@ UserManager.prototype.updateUser = async function(userId, userObj, more) {
   }
   //
   const message = {
-    "Id": user.id,
+    "UserId": user.id,
     "Name": user.firstName + " " + user.lastName,
     "Avatar": user.avatar
   }
@@ -200,7 +200,7 @@ UserManager.prototype.deleteUser = async function(userId, more) {
   }
   //
   const message = {
-    "Id": user.id
+    "UserId": user.id
   }
   const severity = 'DeleteUserIntegrationEvent';
   const exchange = 'booking';
