@@ -137,7 +137,7 @@ UserManager.prototype.createUser = async function(userObj, more) {
   output.user = user;
   //
   const message = {
-    "Id": user._id,
+    "UserId": user._id,
     "Name": user.firstName + " " + user.lastName,
     "BusinessId": user.businessId,
     "Avatar": user.avatar,
