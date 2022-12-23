@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const { RabbitMQ } = require('../config/Publisher');
 const { mongoose } = require('mongoose');
 const { slug } = require('../utilities/Utilities');
+const moment = require('moment');
 
 function UserManager(params) {
   this._businessManager = params.businessManager
@@ -226,7 +227,34 @@ UserManager.prototype.attachBusinessToUserByRabbitMQ = async function (msg) {
   const userId = msg.UserId;
   const businessId = msg.BusinessId;
   return this.attachBusinessToUser(userId, businessId);
-}
+};
+
+UserManager.prototype.generateOPT = async function(userId, OTP) {
+  const currentDate = new Date();
+  const OTPDueTime = moment(currentDate).add(1, 'minute').toISOString();
+  await User.findByIdAndUpdate(userId, {
+    otp: OTP,
+    otpDueTime: OTPDueTime
+  });
+  return { otpDueTime: OTPDueTime };
+};
+
+UserManager.prototype.checkOTP = async function(userId, OTP) {
+  const currentDate = new Date();
+  const user = await User.findById(userId);
+  //
+  if (currentDate > user.otpDueTime) {
+    throw new Error("This OTP has been expired!");
+  } else if (OTP !== user.otp) {
+    throw new Error("Wrong OTP!");
+  } else {
+    return {
+      message: "Correct OTP!",
+      userId
+    }
+  }
+};
+
 //
 
 module.exports = { UserManager };

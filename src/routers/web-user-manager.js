@@ -5,7 +5,7 @@ const { User } = require('../models/_User');
 const { UserManager } = require('../services/UserManager');
 const { BusinessManager } = require('../services/BusinessManager');
 const { auth } = require('../middleware/auth');
-const { sendEmail } = require('../utilities/Utilities');
+const { sendEmail, sendOTP } = require('../utilities/Utilities');
 
 const PATH = '/api/v1';
 
@@ -200,6 +200,53 @@ router.post(PATH + '/reset-password/:id', async (req, res) => {
     //
     res.send(user);
   } catch(error) {
+    res.status(400).send({ message: error.message });
+  }
+});
+
+router.post(PATH + '/forgot-password', async (req, res) => {
+  const { email, realEmail } = req.body;
+  try {
+    if (email) {
+      const user = await User.findOne({ email });
+      if (!user) {
+        throw new Error(`Not found user with email [${email}]`);
+      }
+      // generate OTP
+      const digits = '0123456789';
+      let OTP = '';
+      for (let i = 0; i < 6; i++ ) {
+        OTP += digits[Math.floor(Math.random() * 10)];
+      }
+      //
+      const resultGenerate = await userManager.generateOPT(user._id, OTP);
+      // send email
+      const resultSendMail = await sendOTP({
+        userId: user._id,
+        email: user.email,
+        realEmail,
+        OTP
+      });
+      res.send({
+        ...resultSendMail,
+        ...resultGenerate
+      });
+    }
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+});
+
+router.post(PATH + '/forgot-password/:id', async (req, res) => {
+  const { id } = req.params;
+  const { otp } = req.body;
+  try {
+    const user = await userManager.getUser(id);
+    //
+    const result = await userManager.checkOTP(id, otp);
+    // send email
+    res.send(result);
+  } catch (error) {
     res.status(400).send({ message: error.message });
   }
 });
