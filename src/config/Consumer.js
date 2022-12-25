@@ -25,9 +25,10 @@ const consumer = async (severity) => {
   }
   channel.consume(queue, async (msg) => {
     try {
+        console.log("Da nhan message " + msg.fields.routingKey);
       if (msg !== null) {
         const MAPPING_FUNCTION = {
-          'BusinessUpdatedIntegrationEvent': userManager.attachBusinessToUserByRabbitMQ
+          'PaymentSuccessIntegrationEvent': userManager.attachBusinessToUserByRabbitMQ
         }
         const consumerFunction = MAPPING_FUNCTION[msg.fields.routingKey];
         if (consumerFunction) {
