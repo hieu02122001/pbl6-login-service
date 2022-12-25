@@ -40,6 +40,10 @@ router.get(PATH + '/businesses', auth, async (req, res) => {
       criteria.isActive = query.isActive === "active";
     }
     //
+    if(query && query.isOccupied) {
+      criteria.isOccupied = query.isOccupied === "occupied";
+    }
+    //
     const businesses = await businessManager.findBusinesses(criteria);
     //
     res.send(businesses);

@@ -34,6 +34,12 @@ BusinessManager.prototype.findBusinesses = async function(criteria, more) {
     lodash.set(queryObj, "isActive", isActive);
   }
   //
+  const isOccupied = lodash.get(criteria, "isOccupied");
+  if (lodash.isBoolean(isOccupied)) {
+    if (isOccupied === false) {
+      lodash.set(queryObj, "users", { $size: 0 });
+    }
+  }
   const businesses = await Business.find(queryObj)
     .sort([['createdAt', -1]]);
   //
