@@ -145,7 +145,7 @@ UserManager.prototype.createUser = async function(userObj, more) {
   const message = {
     "UserId": user._id,
     "Name": user.firstName + " " + user.lastName,
-    "BusinessId": user.businessId,
+    "BusinessId": businessId,
     "Avatar": user.avatar,
   }
   const severity = 'UserCreatedIntergrationEvent';
