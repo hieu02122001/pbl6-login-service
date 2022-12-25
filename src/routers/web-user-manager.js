@@ -68,7 +68,7 @@ router.get(PATH + '/users/:id', auth, async (req, res) => {
 });
 
 router.put(PATH + '/users/:id', auth, async (req, res) => {
-  const PICK_FIELDS = ["firstName", "lastName", "email", "password", "phone", "avatar", "gender", "roleId"];
+  const PICK_FIELDS = ["firstName", "lastName", "email", "password", "phone", "avatar", "gender"];
   const userObj = lodash.pick(req.body, PICK_FIELDS);
   const { id } = req.params;
   //
