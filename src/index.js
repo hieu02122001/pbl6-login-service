@@ -25,7 +25,7 @@ app.use(subsRouter);
 taskCheckSubs.start();
 //
 const severity = [
-  'BusinessUpdatedIntegrationEvent'
+  'PaymentSuccessIntegrationEvent'
 ]
 consumer(severity);
 //
