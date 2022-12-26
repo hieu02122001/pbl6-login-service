@@ -78,7 +78,7 @@ BusinessManager.prototype.wrapExtraToBusiness = async function(businessObj, more
   const subs = await Subscription.find({businessId: businessObj.id}).sort([['endTime', -1]]);
   businessObj.endTime = null;
   if (subs.length > 0) {
-    businessObj.endTime = subs[0].endTime.toLocaleString();
+    businessObj.endTime = subs[0].endTime.toLocaleDateString('vi-VI');
   }
   return lodash.omit(businessObj, ["_id"]);
 };

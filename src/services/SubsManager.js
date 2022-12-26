@@ -57,8 +57,8 @@ SubscriptionManager.prototype.wrapExtraToSubscriptions = async function(subsObj,
   //
   subsObj.price = new Intl.NumberFormat('vi-VI').format(subsObj.price);
   //
-  subsObj.startTime = subsObj.startTime.toLocaleString();
-  subsObj.endTime = subsObj.endTime.toLocaleString();
+  subsObj.startTime = subsObj.startTime.toLocaleDateString('vi-VI');
+  subsObj.endTime = subsObj.endTime.toLocaleDateString('vi-VI');
   //
   return subsObj;
 }
