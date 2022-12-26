@@ -11,6 +11,10 @@ const packageManager = new PackageManager();
 router.get(PATH + '/packages', async (req, res) => {
   try {
     const packages = await packageManager.findPackages();
+    for (let i in packages.rows) {
+      packages.rows[i] = packages.rows[i].toJSON();
+      packages.rows[i].price = new Intl.NumberFormat('vi-VI').format(packages.rows[i].price);
+    }
     //
     res.send(packages);
   } catch(error) {

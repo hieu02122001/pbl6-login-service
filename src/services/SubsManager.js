@@ -48,11 +48,14 @@ SubscriptionManager.prototype.findSubscriptions = async function(criteria, more)
 };
 
 SubscriptionManager.prototype.wrapExtraToSubscriptions = async function(subsObj, more) {
+  subsObj = subsObj.toJSON();
   const package = await packageManager.getPackage(subsObj.packageId);
   subsObj.package = lodash.pick(package, ["name"]);
   //
   const business = await businessManager.getBusiness(subsObj.businessId);
   subsObj.business = lodash.pick(business, ["_id", "name", "email", "phone", "isActive"]);
+  //
+  subsObj.price = new Intl.NumberFormat('vi-VI').format(subsObj.price);
   //
   return subsObj;
 }
