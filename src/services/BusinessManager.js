@@ -47,6 +47,15 @@ BusinessManager.prototype.findBusinesses = async function(criteria, more) {
     businesses[i] = await this.wrapExtraToBusiness(businesses[i].toJSON());
   }
   // pagination
+  const isPagination = lodash.get(criteria, "pagination");
+  if (lodash.isBoolean(isPagination) && isPagination === false) {
+    return {
+      count: businesses.length,
+      page: 0,
+      rows: businesses,
+    };
+  }
+  //
   const DEFAULT_LIMIT = 6;
   const page = lodash.get(criteria, "page") || 1;
   const _start = DEFAULT_LIMIT * (page -1);

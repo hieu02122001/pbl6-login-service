@@ -44,6 +44,10 @@ router.get(PATH + '/businesses', auth, async (req, res) => {
       criteria.isOccupied = query.isOccupied === "occupied";
     }
     //
+    if(query && query.pagination) {
+      criteria.pagination = (query.pagination !== "no");
+    }
+    //
     const businesses = await businessManager.findBusinesses(criteria);
     //
     res.send(businesses);
